@@ -1,0 +1,109 @@
+---
+title: "Uniform Manifold Approximation and Projection (UMAP)"
+author: "Ishara Wijayaratne"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+```{r,echo=TRUE,warning=FALSE,message=FALSE,comment=NA}
+# Load necessary libraries
+library(dplyr)
+library(umap)
+library(tidyverse)
+library(caret)
+library(ggplot2)
+library(plotly)
+```
+
+
+```{r,echo=TRUE,warning=FALSE,message=FALSE,comment=NA}
+# Load the dataset
+data(iris)
+iris_df <- as.data.frame(iris)
+
+# Remove duplicate rows
+iris_df <- distinct(iris_df)
+
+# Extract only numerical variables
+sampled_var <- iris_df %>% select(-Species)
+```
+
+#### 2D-UMAP
+
+```{r,echo=TRUE,warning=FALSE,message=FALSE,comment=NA}
+# Set UMAP configuration
+umap_config <- umap.defaults
+umap_config$n_neighbors <- 15  # Number of neighbors (default: 15)
+umap_config$min_dist <- 0.1    # Minimum distance between points (default: 0.1)
+umap_config$n_components <- 2  # 2D UMAP
+
+# Run UMAP
+set.seed(1234567)
+sampled_var.umap <- umap(sampled_var, config = umap_config)
+
+# Convert UMAP output to a dataframe
+layout <- as.data.frame(sampled_var.umap$layout)
+colnames(layout) <- c("UMAP_1", "UMAP_2")
+
+# Add class labels
+layout$classlabels <- iris_df$Species
+
+# Plot UMAP results
+ggplot(data = layout, aes(x = UMAP_1, y = UMAP_2, color = classlabels)) +
+  geom_point(size = 3, alpha = 0.7) +
+  scale_color_manual(values = c("setosa" = "red", "versicolor" = "blue", "virginica" = "green")) +
+  labs(title = "UMAP Visualization of Iris Dataset", 
+       x = "UMAP - 1", 
+       y = "UMAP - 2", 
+       color = "Species") +
+  theme_classic()
+
+```
+
+#### 3D-UMAP
+
+```{r,echo=TRUE,warning=FALSE,comment=NA,fig.height=8,fig.width=8}
+
+# Set UMAP configuration for 3D projection
+umap_config <- umap.defaults
+umap_config$n_neighbors <- 15  # Number of neighbors (default: 15)
+umap_config$min_dist <- 0.1    # Minimum distance between points (default: 0.1)
+umap_config$n_components <- 3  # 3D UMAP
+
+# Perform 3D UMAP
+set.seed(12345)
+sampled_var_3d_umap <- umap(sampled_var, config = umap_config)
+
+# Convert UMAP output to a dataframe
+layout_3d <- as.data.frame(sampled_var_3d_umap$layout)
+colnames(layout_3d) <- c("UMAP_1", "UMAP_2", "UMAP_3")
+
+# Add class labels
+layout_3d$classlabels <- iris_df$Species
+
+# Define color scheme for 3 species
+my_colors <- c("setosa" = "red", "versicolor" = "blue", "virginica" = "green")
+
+# Create an interactive 3D UMAP plot
+plot_ly(data = layout_3d, 
+        x = ~UMAP_1, 
+        y = ~UMAP_2, 
+        z = ~UMAP_3, 
+        color = ~classlabels, 
+        colors = my_colors, 
+        type = "scatter3d", 
+        mode = "markers") %>%
+  layout(scene = list(
+    xaxis = list(title = "UMAP 1"),
+    yaxis = list(title = "UMAP 2"),
+    zaxis = list(title = "UMAP 3"),
+    title = "3D UMAP Visualization of Iris Dataset"
+  ))
+
+```
+

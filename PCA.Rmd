@@ -1,0 +1,117 @@
+---
+title: "Principal component analysis (PCA)"
+author: "Ishara Wijayaratne"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r,echo=TRUE,warning=FALSE,message=FALSE,comment=NA}
+#PCA - determine the most useful variables 
+
+# Load necessary libraries
+library(ggbiplot)  # Install with devtools::install_github("vqv/ggbiplot")
+library(dplyr)
+library(caret)
+library(ggplot2)
+library(plotly)
+```
+
+
+```{r,echo=TRUE,warning=FALSE,message=FALSE,comment=NA}
+# Load the dataset
+data(iris)
+iris_df <- as.data.frame(iris)
+
+# Remove duplicate rows
+iris_df <- distinct(iris_df)
+
+# Extract only numerical variables for PCA
+sampled_var <- iris_df %>% select(-Species)
+
+```
+
+```{r,echo=TRUE,warning=FALSE,message=FALSE,comment=NA}
+# Perform PCA (center and scale the data)
+pca_results <- prcomp(sampled_var, center = TRUE, scale. = TRUE)  
+
+# Summary of PCA (explains variance captured by each principal component)
+summary(pca_results)
+
+# Scree plot - Proportion of Variance Explained (PVE)
+pve <- (pca_results$sdev^2) / sum(pca_results$sdev^2)
+
+plot(pve, xlab = "Principal Component", 
+     ylab = "Proportion of Variance Explained (PVE)",
+     main = "Scree Plot",
+     pch = 20, cex = 2, col = "blue", type = "b")
+
+# Cumulative Variance Explained
+cpv <- cumsum(pve)
+
+plot(cpv, xlab = "Principal Component", 
+     ylab = "Cumulative Proportion of Variance Explained",
+     main = "Cumulative Variance Explained",
+     pch = 20, cex = 2, col = "blue", type = "b")
+
+# Extract loading matrix (contribution of original variables to PCs)
+pca_loadings <- pca_results$rotation
+print(pca_loadings)  # Check which variables contribute most to each PC
+```
+
+##### PC1 (First Principal Component)
+
+The first PC captures the most variance in the dataset.
+
+* Petal.Length (0.580) and Petal.Width (0.565) contribute the most positively.
+* Sepal.Length (0.522) also contributes significantly.
+* Sepal.Width (-0.268) has a weak negative contribution.
+
+**Interpretation:** PC1 is mainly influenced by petal size (both length & width), meaning it likely captures the overall size of the flower.
+
+
+
+```{r,echo=TRUE,warning=FALSE,message=FALSE,comment=NA}
+# Extract PCA scores (newly projected data in PC space)
+pca_scores <- pca_results$x
+
+# Visualizing PCA - Biplot
+ggbiplot(pca_results, choices = c(1,2), obs.scale = 1, var.scale = 1,
+         groups = iris_df$Species, ellipse = TRUE, var.axes = TRUE) + 
+  theme_minimal() + 
+  ggtitle("PCA Biplot of the Iris Dataset") +
+  scale_color_manual(values = c("setosa" = "red", "versicolor" = "blue", "virginica" = "green"))
+```
+
+
+```{r,echo=TRUE,warning=FALSE,message=FALSE,comment=NA,fig.height=8,fig.width=8}
+#3D PCA
+
+# Extract PCA scores (newly projected data in PC space)
+pca_scores <- as.data.frame(pca_results$x)
+
+# Add species labels for coloring
+pca_scores$Species <- iris_df$Species
+
+# Define colors for species
+my_colors <- c("setosa" = "red", "versicolor" = "blue", "virginica" = "green")
+
+# Create an interactive 3D PCA plot
+plot_ly(pca_scores, 
+        x = ~PC1, 
+        y = ~PC2, 
+        z = ~PC3, 
+        color = ~Species, 
+        colors = my_colors, 
+        type = "scatter3d", 
+        mode = "markers") %>%
+  layout(title = "3D PCA Visualization of Iris Dataset",
+         scene = list(xaxis = list(title = "PC1"),
+                      yaxis = list(title = "PC2"),
+                      zaxis = list(title = "PC3")))
+
+
+```
+

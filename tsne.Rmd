@@ -1,0 +1,104 @@
+---
+title: "t-distributed stochastic neighbor embedding (tsne)"
+author: "Ishara Wijayaratne"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r,echo=TRUE,warning=FALSE,message=FALSE}
+# Load necessary libraries
+library(dplyr)
+library(tidyverse)
+library(Rtsne) # t-SNE library
+library(ggplot2) # For visualization
+```
+
+
+```{r,echo=TRUE,warning=FALSE,message=FALSE,comment=NA}
+# Load built-in iris dataset
+data(iris)
+iris_df <- as.data.frame(iris)
+head(iris_df)
+```
+
+```{r,echo=TRUE,warning=FALSE,message=FALSE}
+# Remove duplicate rows to avoid t-SNE error
+iris_df <- distinct(iris_df)
+
+# Extract the variables for t-SNE
+sampled_var <- iris_df[, 1:4]
+
+```
+
+
+#### 2D tSNE
+```{r,echo=TRUE,warning=FALSE,message=FALSE}
+
+# tSNE 2D
+tsne_results <- Rtsne(sampled_var, 
+                      perplexity = 30, 
+                      eta = 1000, 
+                      max_iter = 5000)
+
+# Convert results to a dataframe
+Y <- as.data.frame(tsne_results$Y)
+colnames(Y) <- c("tSNE_1", "tSNE_2")
+
+# Add class labels
+Y$classlabels <- iris_df$Species
+
+# Plot the t-SNE results
+ggplot(Y, aes(x = tSNE_1, y = tSNE_2, col = classlabels)) + 
+  geom_point() +
+  labs(x = "t-SNE - 1", 
+       y = "t-SNE - 2", 
+       color = "Species") + 
+  theme_classic()
+```
+
+
+#### 3D tSNE
+
+```{r,echo=TRUE,warning=FALSE,message=FALSE,comment=NA, results='hide'}
+set.seed(123)  # reproducibility
+tsne_results_3d <- Rtsne(sampled_var, 
+                         perplexity = 30,  # Reduced perplexity to avoid error
+                         eta = 200,  # Adjusted learning rate
+                         max_iter = 500,  # Increased iterations for better convergence
+                         dims = 3, 
+                         verbose = TRUE)
+
+# Convert t-SNE results to a dataframe
+Y_3d <- as.data.frame(tsne_results_3d$Y)
+colnames(Y_3d) <- c("tSNE_1", "tSNE_2", "tSNE_3")
+
+# Add class labels
+Y_3d$classlabels <- iris_df$Species
+
+# Print first few rows
+#head(Y_3d)
+```
+
+
+##### Interactive tSNE plot
+```{r,echo=TRUE,warning=FALSE,message=FALSE,fig.height=8,fig.width=8}
+# Install and load plotly for 3D visualization (if not installed, install with install.packages("plotly"))
+library(plotly)
+
+# Create an interactive 3D scatter plot
+plot_ly(Y_3d, 
+        x = ~tSNE_1, 
+        y = ~tSNE_2, 
+        z = ~tSNE_3, 
+        color = ~classlabels, 
+        colors = c("red", "blue", "green"), 
+        type = "scatter3d", 
+        mode = "markers") %>%
+  layout(title = "3D t-SNE Visualization of Iris Dataset")
+
+
+```
+
