@@ -1,27 +1,23 @@
 # **Unsupervised Dimension Reduction Techniques**
 ---
 
-Three popular unsupervised dimension reduction techniues have been explored
-unsupervised dimesion reduction techniques are 
 
-Three widely used unsupervised dimension reduction techniques have been explored: PCA, t-SNE, and UMAP. These methods help in reducing high-dimensional data while preserving essential structures and patterns.
-
+We explore three popular unsupervised dimension reduction techniques—PCA, t-SNE, and UMAP—to reduce high-dimensional data while preserving key structures. The following code demonstrates **2D** visualizations and **interactive 3D** plots for each method, along with an in-depth analysis of their effectiveness.
 ### PCA (Principal Component Analysis)
-PCA is a linear dimension reduction technique that transforms correlated variables into a set of uncorrelated principal components, ranked by their variance. It preserves global structures, making it ideal for capturing the overall trends in data while improving interpretability and computational efficiency.
+PCA is a linear dimension reduction technique that transforms correlated variables into a set of uncorrelated principal components, ranked by their variance.
 
-
-### [Explore 2D & 3D PCA in RStudio](https://raw.githack.com/isharaWijayaratne/DimensionReductionTechniques/refs/heads/main/PCA.html)
+### [Explore PCA in RStudio](https://raw.githack.com/isharaWijayaratne/DimensionReductionTechniques/refs/heads/main/PCA.html)
 
 
 ### t-SNE (t-Distributed Stochastic Neighbor Embedding)
-t-SNE is a nonlinear technique that maps high-dimensional data into a lower-dimensional space while preserving local relationships. It is particularly effective for visualizing clusters in complex datasets, making it a popular choice for understanding high-dimensional patterns in machine learning applications.
+t-SNE is a nonlinear technique that maps high-dimensional data into a lower-dimensional space while preserving local relationships. 
 
-### [Explore 2D & 3D t-SNE in RStudio](https://raw.githack.com/isharaWijayaratne/DimensionReductionTechniques/refs/heads/main/tsne.html)
+### [Explore 2D & 3D t-SNE plots in RStudio](https://raw.githack.com/isharaWijayaratne/DimensionReductionTechniques/refs/heads/main/tsne.html)
 
 
 ### UMAP (Uniform Manifold Approximation and Projection)
-UMAP is a powerful nonlinear technique that balances local and global structure preservation. It is computationally efficient, scales well to large datasets, and often outperforms t-SNE in maintaining meaningful clusters while providing faster execution times.
+UMAP is a powerful nonlinear technique that balances local and global structure preservation. It often outperforms t-SNE in maintaining meaningful clusters while providing faster execution times.
 
-### [Explore 2D & 3D UMAP in RStudio](https://raw.githack.com/isharaWijayaratne/DimensionReductionTechniques/refs/heads/main/UMAP.html)
+### [Explore 2D & 3D UMAP plots in RStudio](https://raw.githack.com/isharaWijayaratne/DimensionReductionTechniques/refs/heads/main/UMAP.html)
 
 ---
